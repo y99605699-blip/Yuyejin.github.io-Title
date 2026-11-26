@@ -14,8 +14,8 @@ def initialize(raw):
     sheets = list(book)
     base = book['국산투입계수(Ad)']
     codes = [str(c) for c in base[4][2:] if c is not None and str(c).isdigit() and int(str(c)) < 9000]
-    if len(codes) != 380 or len(set(codes)) != len(codes):
-        raise ValueError('이 버전은 첨부된 2023년 380부문 워크북 구조만 지원합니다.')
+    if len(codes) < 2 or len(set(codes)) != len(codes):
+        raise ValueError('부문 코드를 읽지 못했습니다. 엑셀 5행(헤더) 구조를 확인하세요.')
     nm = {str(r[0]): str(r[1]) for r in base[6:]}
     names = [nm[c] for c in codes]
     def matrix(s):
@@ -28,8 +28,13 @@ def initialize(raw):
     L = matrix('생산유발계수'); M = matrix('수입유발계수'); V = matrix('부가가치유발계수')
     ad = matrix('국산투입계수(Ad)'); am = matrix('수입투입계수(Am)')
     rows=book['총투입계수(A)']; ci={str(c):i for i,c in enumerate(rows[4])}
-    vr=next(r for r in rows if str(r[0])=='9690')
-    v=np.array([vr[ci[c]] for c in codes],dtype=float)
+           vr=next((r for r in rows if r and str(r[0])=='9690'),None)
+    if vr is not None:
+        v=np.array([vr[ci[c]] for c in codes],dtype=float)
+    else:
+        ri2={str(r[0]):i for i,r in enumerate(rows) if r}
+        A=np.array([[rows[ri2[c]][ci[k]] for k in codes] for c in codes],dtype=float)
+        v=1-A.sum(axis=0)
     residuals = {'생산':float(np.max(np.abs((np.eye(len(codes))-ad)@L-np.eye(len(codes))))),
                  '수입':float(np.max(np.abs(am@L-M))),
                  '부가가치':float(np.max(np.abs(v[:,None]*L-V)))}
