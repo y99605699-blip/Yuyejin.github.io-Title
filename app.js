@@ -34,9 +34,9 @@ $('download').onclick=()=>{if(!result)return;const rows=[['산업코드','산업
 // ▼ 본인 data 폴더의 실제 파일 이름으로 맞추세요 (대소문자·한글까지 정확히)
 const FILES={
  basic:{label:'기본부문',file:'./data/io-2023.xlsx'},
- small:{label:'소분류',file:'./data/io-2023-소분류.xlsx'},
- mid:{label:'중분류',file:'./data/io-2023-중분류.xlsx'},
- large:{label:'대분류',file:'./data/io-2023-대분류.xlsx'}
+ small:{label:'소분류',file:'./(표)(2023연장)투입산출표_생산자가격_통합소분류.xlsx'},
+ mid:{label:'중분류',file:'./(표)(2023연장)투입산출표_생산자가격_통합중분류.xlsx'},
+ large:{label:'대분류',file:'./(표)(2023연장)투입산출표_생산자가격_통합대분류.xlsx'}
 };
 async function loadSelected(){
  const key=$('level').value,cfg=FILES[key];
